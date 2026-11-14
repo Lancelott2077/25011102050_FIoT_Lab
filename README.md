@@ -39,6 +39,7 @@
 | | **CAT12C**| Nucleo Short vs. Long Press Classification | 23/10/26 | STM32F401RE, HAL_GetTick(), PA5 |
 | | **CAT13** | BME280 Environmental Sensor & HTTP Stream | 27/10/26 | STM32F401RE, BME280 (I2C), ESP8266 |
 | | **CAT14** | BME280 Environmental Telemetry via MQTT | 2/11/26 | STM32F401RE, BME280, MQTT Broker |
+| | **CAT15** | Real-Time Sensing, Cloud Weather Comparison & Dashboard | 9/11/26 | STM32F401RE, BME280, ESP8266, Node-RED |
 
 ---
 
@@ -60,5 +61,6 @@ Foundations_of_IoT/
     ├── CAT11/ (TASK11A, TASK11B)
     ├── CAT12/ (TASK12A, TASK12B, TASK12C)
     ├── CAT13/ (TASK13)
-    └── CAT14/ (TASK14)
+    ├── CAT14/ (TASK14)
+    └── CAT15/ (TASK15)
 ```

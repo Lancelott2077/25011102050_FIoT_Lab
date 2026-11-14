@@ -23,3 +23,4 @@ This folder contains all laboratory experiments performed on **STM32F103 (Blue P
 | | **TASK12C** | Short-Press and Long-Press Detection | 23/10/26 |
 | **CAT13** | **TASK13** | BME280 Sensor Interfacing – HTTP – Node-RED | 27/10/26 |
 | **CAT14** | **TASK14** | BME280 Sensor Interfacing – MQTT – Node-RED | 2/11/26 |
+| **CAT15** | **TASK15** | Real-Time Environmental Sensing, Weather Comparison & Node-RED Analytics | 9/11/26 |
