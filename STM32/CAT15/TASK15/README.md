@@ -64,9 +64,5 @@
 
 ![Node-RED Flow Architecture](dashboard_flow.jpeg)
 
-**Environmental Comparison Dashboard:**
-
-![Environmental Comparison Dashboard](dashboard_prediction.png)
-
 **INFERENCE:**
 The integration of embedded sensing, wireless MQTT telemetry, and cloud analytics demonstrates a complete end-to-end IoT system. The STM32 Nucleo-F401RE reliably acquired high-precision environmental metrics from the BME280 and published lightweight JSON telemetry via the ESP8266 modem with minimal latency. Node-RED ingested the telemetry stream and contrasted local microclimate measurements against cloud weather API observations. The comparative engine identified localized indoor temperature and humidity offsets from ambient regional weather, validating the importance of hyper-local sensing in smart building and environmental automation.
