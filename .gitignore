@@ -1,19 +1,35 @@
+# Keil uVision user settings & layout
 *.uvopt
+*.uvoptx
 *.uvgui.*
+*.uvguix.*
+*.uvgui
+*.uvguix
+*.uvlayout
 *.bak
 *.dep
 *.lnp
+*.iex
 *.htm
 *.build_log.htm
 *.crf
 *.d
+*.o
 *.obj
 *.lst
 *.map
 *.axf
 *.elf
+*.dbgconf
 Listings/
+DebugConfig/
+RTE/
+
+# OS artifacts
 Thumbs.db
+desktop.ini
 .DS_Store
+
+# Whitelist required build artifacts
 !Objects/*.hex
 !Objects/README.md
