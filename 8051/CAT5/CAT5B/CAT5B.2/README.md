@@ -1,19 +1,30 @@
-# CAT5B.2: PWM DC Motor Speed Regulation
+# CAT5B.2 - Software PWM DC Motor Speed Control
 
-## 🎯 Objective
-Generate variable-duty PWM waveforms from the 8051 microcontroller to control the rotational speed and torque of a DC motor via an external driver interface.
+**EXP:** CAT5B.2
 
-## ⚡ Hardware Architecture & Pinout
-- **MCU:** AT89S52
-- **Output:** `P1^0` connected to driver logic input.
-- **Driver:** L293D / NPN Transistor with flyback diode protection.
+**DATE:** 10/08/26
+
+**NAME OF EXP:** Hardware Timer and Interrupt-Based Timing - PWM DC Motor Speed Regulation
+
+**HARDWARE SETUP / PLATFORM:**
+- Microcontroller: AT89S52
+- Output Pin: Port 1 Pin 0 (P1.0)
+- Motor Driver: Transistor / L293D driver with flyback diode
+- Actuator: 5V DC Toy Motor
+
+**TASK NO:**
+1. Generate a variable-duty PWM signal using Timer0 interrupts.
+2. Interface the PWM output to a motor driver circuit.
+3. Verify speed variation across different duty cycle thresholds.
+
+**Circuit Diagram:**
 
 ![Circuit Diagram](circuit.png)
 
-## 🧠 Engineering Implementation
-1. **Duty Cycle Modulation:** Synthesizes variable average DC voltage across motor windings by adjusting the pulse-width ratio.
-2. **Torque Compensation:** Maintains high base frequency to avoid audible acoustic noise while ensuring sufficient starting current at lower speed settings.
-3. **Speed Ramp:** Software control profile safely steps motor current to prevent back-EMF spikes.
+**Core Logic / Pseudocode / Code Base:**
+- Timer0 ISR generates the base PWM timing intervals.
+- The average voltage delivered to the motor terminals is proportional to the duty cycle ratio ($	ext{V}_{	ext{avg}} = 	ext{V}_{	ext{supply}} 	imes 	ext{Duty}$).
+- Speed ramps smoothly by adjusting the duty ratio from 20% to 100% to prevent high starting current surges.
 
-## 📊 Verification & Results
-- Stable motor speed control demonstrated across 20% to 100% duty cycle ranges.
+**INFERENCE:**
+Timer0-generated PWM successfully varied the rotational speed of the DC motor. The driver circuit isolated motor inductive spikes from resetting the microcontroller.

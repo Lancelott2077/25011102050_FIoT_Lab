@@ -1,21 +1,31 @@
-# CAT8C: STM32 Temporal Press Classifier (Short vs. Long Press)
+# CAT8C – STM32 Short Press vs. Long Press Classification
 
-## 🎯 Objective
-Implement time-domain classification on a single pushbutton to distinguish between a transient tap (Short Press, < 1s) and sustained hold (Long Press, > 1s) to trigger distinct operational modes.
+**EXP:** CAT8C
 
-## ⚡ Hardware Architecture & Pinout
-- **MCU:** STM32F103C8T6
-- **Input:** Pushbutton with pull-up resistor.
-- **Outputs:** System indicator LEDs / Serial debug output.
+**DATE:** 18/09/26
+
+**NAME OF EXP:** STM32 Temporal Button Press Classification (Short vs. Long Press)
+
+**HARDWARE SETUP / PLATFORM:**
+- Microcontroller: STM32F103C8T6 (Blue Pill)
+- Input: Normally-open tactile button with pull-up
+- Output: LED indicator on PC13
+
+**TASK NO:**
+1. Measure the duration of a button press using `HAL_GetTick()`.
+2. Classify the press as either a Short Press (< 1000 ms) or Long Press (≥ 1000 ms).
+3. Execute different LED actions depending on the classified press duration.
+
+**Circuit Diagram:**
 
 ![Circuit Diagram](circuit.png)
 
-## 🧠 Engineering Implementation
-1. **SysTick Timestamping:** On falling edge, records start time $t_{\text{press}} = \text{HAL\_GetTick()}$.
-2. **Duration Calculation:** On rising edge, calculates $\Delta t = t_{\text{release}} - t_{\text{press}}$.
-3. **Classification Tree:**
-   - $\Delta t < 1000 \text{ ms}$: Short Press $\implies$ Toggle primary LED mode.
-   - $\Delta t \ge 1000 \text{ ms}$: Long Press $\implies$ Enter continuous strobe alert mode.
+**Core Logic / Pseudocode / Code Base:**
+- Detect falling edge when the button is pressed and record $t_{	ext{start}} = 	ext{HAL\_GetTick()}$.
+- Wait until button is released, then record $t_{	ext{stop}} = 	ext{HAL\_GetTick()}$.
+- Calculate duration $\Delta t = t_{	ext{stop}} - t_{	ext{start}}$:
+  - If $\Delta t < 1000 	ext{ ms}$: Short Press $\implies$ Toggle LED once.
+  - If $\Delta t \ge 1000 	ext{ ms}$: Long Press $\implies$ Trigger a 5-blink rapid burst.
 
-## 📊 Verification & Results
-- Distinct visual responses reliably triggered based on user press duration.
+**INFERENCE:**
+Using SysTick timestamps allowed reliable differentiation between a momentary click and a sustained hold on a single button, doubling its functional utility.

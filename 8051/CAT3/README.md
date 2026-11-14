@@ -1,24 +1,34 @@
-# CAT3: Tactile Switch Debouncing & Multi-State LED Machine
+# CAT3 - Tactile Switch Debouncing & 4-State LED Controller
 
-## 🎯 Objective
-Implement an active-LOW pushbutton input with software debounce filtering and drive an interactive 4-state visual display sequence on a 4-LED array.
+**EXP:** CAT3
 
-## ⚡ Hardware Architecture & Pinout
-- **MCU:** AT89S52 (11.0592 MHz)
-- **Input:** Tactile pushbutton connected to `P2^6` (Active-LOW with internal pull-up).
-- **Control Signal:** `P2^3` pulled LOW to establish reference ground.
-- **Outputs:** Port 1 lower nibble (`P1^0` to `P1^3`) connected to individual LEDs.
+**DATE:** 27/07/26
+
+**NAME OF EXP:** Switch Logic and Multi-State LED Pattern Controller
+
+**HARDWARE SETUP / PLATFORM:**
+- Microcontroller: AT89S52 (11.0592 MHz)
+- Pushbutton: Tactile switch connected to P2.6 (Active-LOW, pull-up enabled)
+- Reference Ground Pin: P2.3 driven LOW
+- Output LEDs: 4 LEDs connected to Port 1 lower nibble (P1.0 - P1.3)
+- Current-limiting resistors: 330 Ω on each LED
+
+**TASK NO:**
+1. Interface an active-LOW tactile pushbutton to an 8051 input pin.
+2. Implement software debouncing to reject mechanical contact bounce.
+3. Design a state machine that advances through 4 visual LED display modes on each button press.
+
+**Circuit Diagram:**
 
 ![Circuit Diagram](circuit.png)
 
-## 🧠 Engineering Implementation
-1. **Mechanical Debounce Filter:** Reads `P2^6 == 0`, applies a 20 ms settling delay, re-samples the pin, and holds execution until button release (`while(P2^6 == 0)`) to ensure single-trigger operation per press.
-2. **Finite State Machine (FSM):** A state variable cycles from `0` to `3` on consecutive debounced presses:
-   - **State 0 (Running Light):** Single illuminated LED shifts from bit 0 to bit 3.
-   - **State 1 (Binary Counter):** 4-bit binary accumulator counting from 0x0 to 0xF.
-   - **State 2 (Alternating Pattern):** Complementary toggle (`0b0101` ↔ `0b1010`).
-   - **State 3 (All-Flash):** Simultaneous synchronous blinking of all 4 LEDs.
+**Core Logic / Pseudocode / Code Base:**
+- **Debounce Algorithm:** When P2.6 reads 0, wait 20 ms. If still 0, wait until the button is released (`while(P2.6 == 0)`), then increment the state counter.
+- **State Machine Modes:**
+  - **State 0 (Running LED):** Shifts a single active bit across P1.0 -> P1.1 -> P1.2 -> P1.3.
+  - **State 1 (Binary Counter):** Displays a 4-bit binary count from 0 to 15.
+  - **State 2 (Alternating Pattern):** Toggles between odd and even LEDs (0x05 <-> 0x0A).
+  - **State 3 (All Flash):** Simultaneously flashes all 4 LEDs ON and OFF (0x0F <-> 0x00).
 
-## 📊 Verification & Results
-- Clean state transitions observed without false-triggering or contact chatter.
-- Preserved upper nibble `P1 & 0xF0` to prevent collateral pin disruption.
+**INFERENCE:**
+Mechanical contact bounce was successfully filtered using a 20 ms software delay and release detection. The state machine cycled reliably between the 4 patterns with exactly one mode change per physical press.

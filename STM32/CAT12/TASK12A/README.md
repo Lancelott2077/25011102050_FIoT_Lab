@@ -1,19 +1,38 @@
-# CAT12A: Nucleo-F401RE Board Bring-Up & On-Board LED
+# CAT12A – Nucleo-F401RE On-Board LED Bring-Up
 
-## 🎯 Objective
-Bring up the high-performance STMicroelectronics NUCLEO-F401RE development board (ARM Cortex-M4 with FPU) and drive the on-board green user LED (LD2) at 1 Hz.
+**EXP:** CAT12A
 
-## ⚡ Hardware Architecture & Pinout
-- **MCU:** STM32F401RET6 (ARM Cortex-M4 @ 84 MHz, 512 KB Flash, 96 KB SRAM)
-- **LED:** On-board Green LED `LD2` connected to `PA5`.
-- **Debugger:** On-board ST-LINK/V2-1 with Virtual COM Port (VCP).
+**DATE:** 23/10/26
+
+**NAME OF EXP:** On-Board LED Bring-Up (NUCLEO-F401RE)
+
+**HARDWARE SETUP / PLATFORM:**
+- Board: STMicroelectronics NUCLEO-F401RE
+- Microcontroller: STM32F401RET6 (ARM Cortex-M4 with FPU, 84 MHz)
+- Target Pin: PA5 connected to on-board green LED (LD2)
+- Framework: STM32Cube HAL
+
+**TASK NO:**
+1. Configure the STM32F401RE clock tree for 84 MHz operation.
+2. Initialize pin PA5 as a push-pull output.
+3. Toggle green LED LD2 at a 1 Hz rate in the main loop.
+
+**Circuit Diagram:**
 
 ![Circuit Diagram](circuit.png)
 
-## 🧠 Engineering Implementation
-1. **Clock Tree Configuration:** Configures Phase-Locked Loop (PLL) from 16 MHz internal HSI clock to achieve peak 84 MHz core CPU frequency with 2 wait states for Flash.
-2. **GPIO Driver Configuration:** Initialized `PA5` with `GPIO_MODE_OUTPUT_PP`, `GPIO_NOPULL`, and `GPIO_SPEED_FREQ_LOW`.
-3. **Execution Loop:** Calls `HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5)` inside the main application loop spaced by 500 ms delays.
+**Core Logic / Pseudocode / Code Base:**
+- Clock setup: High-Speed Internal (HSI) 16 MHz clock multiplied via PLL to 84 MHz.
+- GPIO Init:
+  ```c
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+  GPIO_InitStruct.Pin = GPIO_PIN_5;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  ```
+- Application loop calls `HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5)` with `HAL_Delay(500)`.
 
-## 📊 Verification & Results
-- Verified 84 MHz core frequency and precise 1 Hz flashing on green LED LD2.
+**INFERENCE:**
+The Cortex-M4 Nucleo-64 board was brought up successfully. The user green LED LD2 toggled steadily at 1.0 Hz.

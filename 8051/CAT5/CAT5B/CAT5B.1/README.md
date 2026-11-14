@@ -1,19 +1,33 @@
-# CAT5B.1: High-Frequency Timer0 Software PWM Breathing LED
+# CAT5B.1 - High-Frequency Timer0 Software PWM Breathing LED
 
-## 🎯 Objective
-Synthesize a software Pulse Width Modulation (PWM) signal on a single GPIO pin using Timer0 interrupts to produce a smooth, logarithmic LED breathing luminance effect.
+**EXP:** CAT5B.1
 
-## ⚡ Hardware Architecture & Pinout
-- **MCU:** AT89S52 (11.0592 MHz)
-- **Output:** `P1^0` driving high-brightness LED.
-- **Timer:** Timer 0 configured for ~100 µs high-frequency tick.
+**DATE:** 10/08/26
+
+**NAME OF EXP:** Hardware Timer and Interrupt-Based Timing - Software PWM Breathing LED
+
+**HARDWARE SETUP / PLATFORM:**
+- Microcontroller: AT89S52 (11.0592 MHz)
+- Output Pin: Port 1 Pin 0 (P1.0) connected to an LED through a 330 Ω resistor
+- Timer: Timer 0 configured for ~100 µs interrupt interval
+
+**TASK NO:**
+1. Configure Timer0 in Mode 1 to trigger periodic interrupts every ~100 µs.
+2. Implement a 10-step software PWM generator on pin P1.0.
+3. Create a smooth LED breathing effect by sweeping the duty cycle up and down.
+
+**Circuit Diagram:**
 
 ![Circuit Diagram](circuit.png)
 
-## 🧠 Engineering Implementation
-1. **PWM Granularity:** Timer0 triggers every ~100 µs (`TH0=0xFF, TL0=0xA4`). Over 10 ticks, a full PWM period of 1.0 ms (1 kHz carrier frequency) is formed, eliminating visual flicker.
-2. **Duty Cycle Modulation:** A software duty counter compares current cycle against target duty (0–10).
-3. **Triangular Breathing Engine:** Every 500 ISR cycles, the duty cycle step ramps upward until peak brightness, then reverses downward in a smooth continuous cycle.
+**Core Logic / Pseudocode / Code Base:**
+- Timer0 reloaded with `TH0 = 0xFF, TL0 = 0xA4` inside the ISR for a ~100 µs period.
+- A PWM counter steps from 0 to 9 (1 kHz carrier frequency):
+  - If `count < duty`, output pin is HIGH.
+  - Else, output pin is LOW.
+- A speed counter updates the `duty` variable every 500 ISR cycles:
+  - If ramping up, `duty++` until 10.
+  - If ramping down, `duty--` until 0.
 
-## 📊 Verification & Results
-- 1 kHz PWM base frequency verified with smooth, human-eye-friendly brightness transitions.
+**INFERENCE:**
+A 1 kHz software PWM signal was successfully produced on a general-purpose 8051 pin without dedicated PWM hardware. The gradual ramp of the duty cycle produced a smooth and visually appealing LED breathing effect.

@@ -1,22 +1,33 @@
-# CAT5A: Hardware Timer0 Interrupt & Low-Power IDLE Mode
+# CAT5A - Hardware Timer0 1-Second LED Blink & IDLE Sleep
 
-## 🎯 Objective
-Achieve drift-free 1-second LED toggling using 8051 hardware Timer0 in 16-bit mode, offloading timing entirely from the CPU and placing the core into low-power IDLE sleep.
+**EXP:** CAT5A
 
-## ⚡ Hardware Architecture & Pinout
-- **MCU:** AT89S52 (11.0592 MHz)
-- **Target Pin:** `P1^0` connected to status LED.
-- **Timer Peripheral:** Timer 0, Mode 1 (16-bit Timer/Counter).
+**DATE:** 10/08/26
+
+**NAME OF EXP:** Timer and Interrupt Programming - Hardware Timer0 1-Second LED Toggle
+
+**HARDWARE SETUP / PLATFORM:**
+- Microcontroller: AT89S52 (11.0592 MHz crystal)
+- Timer Peripheral: Timer 0, Mode 1 (16-bit Timer/Counter)
+- Output Pin: Port 1 Pin 0 (P1.0) connected to status LED
+
+**TASK NO:**
+1. Configure Timer 0 in 16-bit Mode 1 with interrupt generation.
+2. Calculate the reload value for a 10 ms base tick and count 100 overflows to produce 1.0 second.
+3. Put the CPU into low-power IDLE sleep mode between timer interrupts.
+
+**Circuit Diagram:**
 
 ![Circuit Diagram](circuit.png)
 
-## 🧠 Engineering Implementation
-1. **Timer Reload Calculation:**
-   $$	ext{Machine Cycle} = rac{12}{11.0592 	ext{ MHz}} = 1.08507 	ext{ µs}$$
-   $$	ext{Counts for 10 ms} = rac{10000 	ext{ µs}}{1.08507 	ext{ µs}} pprox 9216 	ext{ counts (0x2400)}$$
-   $$	ext{Preload Value} = 65536 - 9216 = 56320 = 	ext{0xDC00} \implies 	ext{TH0}=0xDC, 	ext{TL0}=0x00$$
-2. **Interrupt Service Routine (ISR):** Vector 1 (`0x000B`) reloads `TH0`/`TL0` and increments a software counter. At count 100 (100 × 10 ms = 1.0 s), `P1^0` is inverted.
-3. **Power Management:** Main loop executes `PCON |= 0x01` to halt the CPU core until the next timer tick wakes it up, minimizing dynamic power consumption.
+**Core Logic / Pseudocode / Code Base:**
+- At 11.0592 MHz, 1 machine cycle is 1.085 µs. A 10 ms delay requires 9216 counts.
+- Preload value: $65536 - 9216 = 56320 = 	ext{0xDC00}$ ($	ext{TH0} = 	ext{0xDC}, 	ext{TL0} = 	ext{0x00}$).
+- Interrupt Service Routine (`timer0_isr` interrupt 1):
+  - Reloads TH0 = 0xDC, TL0 = 0x00, clears TF0.
+  - Increments tick counter `k`.
+  - When `k >= 100`, toggles P1.0 and resets `k = 0`.
+- Main loop executes `PCON |= 0x01` (IDLE mode), halting CPU clocks until the next interrupt arrives.
 
-## 📊 Verification & Results
-- 1.0 Hz square wave verified with zero timing jitter compared to software loops.
+**INFERENCE:**
+Using hardware Timer0 interrupts eliminated busy-waiting from the main loop and produced an accurate 1.0-second LED flash rate. The microcontroller remained in IDLE sleep between timer ticks, conserving power.

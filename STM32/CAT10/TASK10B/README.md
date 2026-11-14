@@ -1,20 +1,31 @@
-# CAT10B: ESP8266 AT Command Protocol Negotiation & Handshake
+# CAT10B – ESP8266 AT Command Protocol Handshake
 
-## 🎯 Objective
-Implement an automated handshake supervisor on STM32 that issues AT commands to the ESP8266 modem, parses response delimiters (`OK`, `ERROR`), and extracts firmware telemetry.
+**EXP:** CAT10B
 
-## ⚡ Hardware Architecture & Pinout
-- **Master:** STM32F103C8T6 (USART2 at 115200 Baud)
-- **Slave:** ESP8266 Wemos D1 Mini running official Espressif Non-OS AT firmware.
+**DATE:** 05/10/26
+
+**NAME OF EXP:** Explore ESP8266 AT Command Interface
+
+**HARDWARE SETUP / PLATFORM:**
+- Host MCU: STM32F103C8T6 (USART2 at 115200 Baud)
+- Wi-Fi Modem: ESP8266 Wemos D1 Mini running official AT firmware
+
+**TASK NO:**
+1. Dispatch basic AT test commands from the STM32 to the ESP8266.
+2. Query firmware and SDK version using `AT+GMR`.
+3. Verify modem responses (`OK`, `ready`) to establish a known baseline state.
+
+**Circuit Diagram:**
 
 ![Circuit Diagram](circuit.png)
 
-## 🧠 Engineering Implementation
-1. **Modem Probe Command Sequence:**
-   - `AT\r\n`: Basic connection alive check $\implies$ Expects `OK`.
-   - `AT+GMR\r\n`: Queries AT version and SDK build information.
-   - `AT+RST\r\n`: Executes software reboot and synchronizes state machine.
-2. **Response Parser Engine:** Implements timeout-bounded string matching to detect `OK` responses and gracefully catch modem fault states.
+**Core Logic / Pseudocode / Code Base:**
+- Sends `AT
+` and waits for `OK`.
+- Sends `AT+GMR
+` to read core version and AT interpreter version.
+- Sends `AT+RST
+` to restart modem and synchronizes with the `ready` response string.
 
-## 📊 Verification & Results
-- Verified automated modem initialization and firmware version extraction over UART bus.
+**INFERENCE:**
+The ESP8266 modem responded properly to standard AT commands. The firmware version was identified and verified over the inter-processor UART link.

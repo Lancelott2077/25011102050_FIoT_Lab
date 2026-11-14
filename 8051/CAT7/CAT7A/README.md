@@ -1,23 +1,35 @@
-# CAT7A: 16x2 Character LCD 4-Bit Interface & Keypad Navigation
+# CAT7A - 16x2 Character LCD 4-Bit Interface & Keypad Navigation
 
-## 🎯 Objective
-Interface an industry-standard HD44780 16x2 alphanumeric LCD in 4-bit nibble mode and control the visual position of a character (`*`) across the 2x16 matrix using directional keypad keys.
+**EXP:** CAT7A
 
-## ⚡ Hardware Architecture & Pinout
-- **MCU:** AT89S52
-- **LCD Control (Port 3):** `P3.2` (RS), `P3.3` (EN).
-- **LCD Data Bus (Port 3):** `P3.4`–`P3.7` connected to LCD `D4`–`D7`.
-- **4x3 Keypad (Port 2):** Keys 2 (Up), 8 (Down), 4 (Left), 6 (Right).
+**DATE:** 24/08/26
+
+**NAME OF EXP:** LCD Interfacing and Display Control - 4-Bit Mode with Keypad Navigation
+
+**HARDWARE SETUP / PLATFORM:**
+- Microcontroller: AT89S52
+- Display: 16x2 Alphanumeric LCD (HD44780 controller)
+- LCD Connections (Port 3): RS = P3.2, EN = P3.3, Data lines D4-D7 = P3.4-P3.7
+- 4x3 Keypad (Port 2): Keys 2 (Up), 8 (Down), 4 (Left), 6 (Right)
+
+**TASK NO:**
+1. Interface a 16x2 LCD using a 4-bit nibble data transfer mode to save pins.
+2. Initialize display settings (4-bit, 2-line, 5x8 font, display ON, cursor ON).
+3. Read directional keys from the keypad and move an asterisk cursor (`*`) across the 2x16 screen.
+
+**Circuit Diagram:**
 
 ![Circuit Diagram](circuit.png)
 
-## 🧠 Engineering Implementation
-1. **4-Bit Nibble Mode Initialization:**
-   Frees 4 microcontroller I/O pins by sending high-nibble first, pulsing Enable (`EN`), followed by low-nibble. Initial sequence forces HD44780 controller into 4-bit mode (`0x30`, `0x30`, `0x30`, `0x20`).
-2. **DDRAM Address Computation:**
-   `lcd_goto(row, col)` writes command byte `0x80 | (row == 0 ? col : 0x40 + col)`.
-3. **Cursor Navigation Engine:**
-   Scans matrix keypad; keys 2/8 alter rows (clamped 0–1) and keys 4/6 alter columns (clamped 0–15). Old position is overwritten with `' '` and new coordinate receives `'*'`.
+**Core Logic / Pseudocode / Code Base:**
+- **4-Bit Nibble Mode:** Byte output sends high 4 bits first, toggles EN high-to-low, then sends low 4 bits and toggles EN again.
+- **DDRAM Addressing:** Line 1 starts at 0x80; Line 2 starts at 0xC0. `lcd_goto(row, col)` writes command `0x80 | (row ? 0x40 + col : col)`.
+- **Keypad Movement:**
+  - Key 2: Decrements row (clamped to 0).
+  - Key 8: Increments row (clamped to 1).
+  - Key 4: Decrements column (clamped to 0).
+  - Key 6: Increments column (clamped to 15).
+  - Old position is erased with a space `' '` before drawing `'*'` at the new coordinate.
 
-## 📊 Verification & Results
-- Fluid, bounds-checked cursor mobility across all 32 LCD characters cells.
+**INFERENCE:**
+Operating the LCD in 4-bit mode reduced required data lines from 8 down to 4. Cursor position was navigated interactively across both rows and all 16 columns using the matrix keypad.

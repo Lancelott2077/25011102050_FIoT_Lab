@@ -1,22 +1,33 @@
-# CAT10A: STM32 to Wemos D1 (ESP8266) UART Interconnect
+# CAT10A – STM32 to Wemos D1 (ESP8266) UART Bridge
 
-## 🎯 Objective
-Establish a reliable inter-processor communication channel between an STM32F103 host controller and an ESP8266 Wemos D1 Mini Wi-Fi SoC across a dedicated hardware UART bus.
+**EXP:** CAT10A
 
-## ⚡ Hardware Architecture & Pinout
-- **Master MCU:** STM32F103C8T6
-- **Wi-Fi Co-Processor:** Wemos D1 Mini (ESP8266EX)
-- **Bus Interconnect:**
-  - STM32 `PA2` (USART2_TX) $\longrightarrow$ Wemos `RXD` (GPIO3)
-  - STM32 `PA3` (USART2_RX) $\longleftarrow$ Wemos `TXD` (GPIO1)
-  - Common Ground (`GND` ↔ `GND`)
+**DATE:** 05/10/26
+
+**NAME OF EXP:** Establish STM32 ↔ Wemos ESP8266 UART Communication
+
+**HARDWARE SETUP / PLATFORM:**
+- Host MCU: STM32F103C8T6
+- Wi-Fi SoC: Wemos D1 Mini (ESP8266)
+- Wiring:
+  - STM32 PA2 (USART2_TX) -> Wemos RX (GPIO3)
+  - STM32 PA3 (USART2_RX) -> Wemos TX (GPIO1)
+  - Common Ground connected
+- Debug Port: STM32 USART1 (PA9/PA10) connected to PC terminal
+
+**TASK NO:**
+1. Wire a dedicated hardware UART channel between the STM32F103 and Wemos D1 Mini.
+2. Verify 3.3V logic level compatibility and baud rate matching (115200 Baud).
+3. Implement a transparent bidirectional bridge relaying bytes between PC (USART1) and ESP8266 (USART2).
+
+**Circuit Diagram:**
 
 ![Circuit Diagram](circuit.png)
 
-## 🧠 Engineering Implementation
-1. **Electrical Compatibility:** Both STM32F103 and ESP8266 operate natively on 3.3V logic, allowing direct signal routing without bidirectional level shifters.
-2. **Dual Serial Architecture:** STM32 USART1 serves as user debug console to PC, while USART2 acts as an internal machine-to-machine bridge to ESP8266.
-3. **Bridge Firmware:** Relays bytes received on USART1 to USART2 and vice versa, verifying transparent channel pass-through.
+**Core Logic / Pseudocode / Code Base:**
+- Both chips operate on 3.3V I/O, allowing direct connection without level converters.
+- Firmware loops reading USART1 (PC commands) and forwarding to USART2 (ESP8266).
+- Simultaneously reads USART2 (ESP8266 responses) and forwards to USART1 (PC console).
 
-## 📊 Verification & Results
-- Bi-directional character pass-through verified between host PC, STM32, and ESP8266 at 115200 Baud.
+**INFERENCE:**
+A transparent serial bridge was established. Commands sent from the PC reached the ESP8266, and modem responses were displayed back on the PC monitor without character loss.

@@ -1,19 +1,33 @@
-# CAT5B.3: PWM Servo Motor Angular Sweep
+# CAT5B.3 - Timer PWM Servo Motor Sweep
 
-## 🎯 Objective
-Implement standard 50 Hz RC servo control signaling with pulse durations between 1.0 ms (-90°) and 2.0 ms (+90°) using Timer0 interrupt timing.
+**EXP:** CAT5B.3
 
-## ⚡ Hardware Architecture & Pinout
-- **MCU:** AT89S52 (11.0592 MHz)
-- **Output:** `P1^0` connected to Servo Control wire.
-- **Power:** External +5V regulated DC supply (common ground with 8051).
+**DATE:** 10/08/26
+
+**NAME OF EXP:** Hardware Timer and Interrupt-Based Timing - Servo Motor Angular Sweep
+
+**HARDWARE SETUP / PLATFORM:**
+- Microcontroller: AT89S52 (11.0592 MHz)
+- Output Pin: Port 1 Pin 0 (P1.0) connected to servo signal wire
+- Actuator: SG90 / TowerPro Micro Servo (5V)
+- Power: External regulated 5V supply with common ground
+
+**TASK NO:**
+1. Generate standard 50 Hz (20 ms period) RC servo control pulses using 8051 timers.
+2. Modulate pulse width between 1.0 ms (-90°) and 2.0 ms (+90°).
+3. Implement a continuous back-and-forth angular sweep of the servo horn.
+
+**Circuit Diagram:**
 
 ![Circuit Diagram](circuit.png)
 
-## 🧠 Engineering Implementation
-1. **Frame Timing:** Synthesizes a 20 ms total cycle time (50 Hz repetition rate).
-2. **Pulse-Width Steering:** Generates active HIGH pulses from 1.0 ms to 2.0 ms, steering the servo shaft smoothly across its full 180° displacement range.
-3. **Position Sweep:** Implements timed angular increments to execute sweeping motions without mechanical overshoot.
+**Core Logic / Pseudocode / Code Base:**
+- The servo requires a 20 ms repeating frame.
+- High-time duration determines position:
+  - 1.0 ms $\implies$ -90 degrees
+  - 1.5 ms $\implies$ 0 degrees (neutral)
+  - 2.0 ms $\implies$ +90 degrees
+- Timer0 tracks high-pulse and low-pulse durations to maintain an accurate 50 Hz frame rate.
 
-## 📊 Verification & Results
-- Continuous jitter-free angular sweeps verified on standard SG90/MG995 servo motors.
+**INFERENCE:**
+The AT89S52 generated stable 50 Hz PWM control pulses. The servo arm tracked the command signal cleanly across its full 180° range without jitter.

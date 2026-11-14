@@ -1,22 +1,33 @@
-# CAT10C: Wemos ESP8266 Wi-Fi Station Mode Network Association
+# CAT10C – Wemos ESP8266 Wi-Fi Station Association
 
-## 🎯 Objective
-Automate Wi-Fi Station (STA) mode initialization and network association on the ESP8266 from the STM32 host to join a 2.4 GHz IEEE 802.11 b/g/n wireless local area network.
+**EXP:** CAT10C
 
-## ⚡ Hardware Architecture & Pinout
-- **Host Controller:** STM32F103C8T6
-- **Wi-Fi Modem:** ESP8266 Wemos D1 Mini
-- **Network Interface:** 2.4 GHz Wi-Fi Access Point / Router with WPA2-PSK.
+**DATE:** 05/10/26
+
+**NAME OF EXP:** Connect Wemos ESP8266 to Wi-Fi Network
+
+**HARDWARE SETUP / PLATFORM:**
+- Host MCU: STM32F103C8T6
+- Wi-Fi Modem: ESP8266 Wemos D1 Mini
+- Network: 2.4 GHz 802.11 b/g/n Wi-Fi Access Point (WPA2-PSK)
+
+**TASK NO:**
+1. Configure ESP8266 in Wi-Fi Station mode (`AT+CWMODE=1`).
+2. Join a local Wi-Fi network using `AT+CWJAP="SSID","PASSWORD"`.
+3. Query assigned IP address and MAC address with `AT+CIFSR`.
+
+**Circuit Diagram:**
 
 ![Circuit Diagram](circuit.png)
 
-## 🧠 Engineering Implementation
-1. **Station Mode Configuration:**
-   - Issues `AT+CWMODE=1` to enforce Wi-Fi Station role (disabling SoftAP to reduce RF overhead).
-2. **WPA2 Association:**
-   - Dispatches `AT+CWJAP="SSID","PASSWORD"` with extended timeout (10–15 s).
-   - Monitors response stream for `WIFI CONNECTED`, `WIFI GOT IP`, and final confirmation `OK`.
-3. **Network Status Verification:** Queries assigned IPv4 lease and MAC address using `AT+CIFSR`.
+**Core Logic / Pseudocode / Code Base:**
+- Command `AT+CWMODE=1
+` sets client station mode.
+- Command `AT+CWJAP="SSID","PASS"
+` connects to the access point.
+- STM32 monitors response stream for `WIFI CONNECTED` and `WIFI GOT IP`.
+- Command `AT+CIFSR
+` fetches the assigned station IP address for display on the debug terminal.
 
-## 📊 Verification & Results
-- ESP8266 successfully associates with Wi-Fi AP and obtains a dynamic DHCP IP address.
+**INFERENCE:**
+The ESP8266 successfully authenticated and associated with the local Wi-Fi router, obtaining a valid DHCP IP address.

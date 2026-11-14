@@ -1,24 +1,37 @@
-# CAT11A: ESP8266 Embedded TCP/HTTP Web Server
+# CAT11A – ESP8266 Embedded TCP/HTTP Server
 
-## 🎯 Objective
-Configure the ESP8266 as a multi-connection TCP server listening on Port 80, parse incoming HTTP GET requests, and deliver static HTML response payloads to browser clients.
+**EXP:** CAT11A
 
-## ⚡ Hardware Architecture & Pinout
-- **Host:** STM32F103C8T6
-- **Wi-Fi Server:** ESP8266 Wemos D1 Mini (Port 80 HTTP listener)
-- **Client:** Web Browser / HTTP Client on the local Wi-Fi subnet.
+**DATE:** 14/10/26
+
+**NAME OF EXP:** Configure ESP8266 TCP Server & Static HTTP Response
+
+**HARDWARE SETUP / PLATFORM:**
+- Host MCU: STM32F103C8T6
+- Wi-Fi Server: ESP8266 Wemos D1 Mini (Port 80)
+- Client: Web browser / HTTP client on the same local network
+
+**TASK NO:**
+1. Enable multi-connection socket multiplexing on ESP8266 (`AT+CIPMUX=1`).
+2. Start an internal TCP server listening on Port 80 (`AT+CIPSERVER=1,80`).
+3. Intercept incoming `GET /` requests and return an HTTP 200 OK HTML response page.
+
+**Circuit Diagram:**
 
 ![Circuit Diagram](circuit.png)
 
-## 🧠 Engineering Implementation
-1. **Multi-IP Socket Setup:**
-   - `AT+CIPMUX=1` enables multi-connection socket multiplexing (channels 0–4).
-   - `AT+CIPSERVER=1,80` starts TCP server listening on default HTTP port 80.
-2. **Request Parsing:** Traps incoming data stream indicator `+IPD,<channel>,<len>:GET / HTTP/1.1`.
-3. **Response Assembly:**
-   - Prepares HTTP 200 OK header with `Content-Type: text/html`.
-   - Issues `AT+CIPSEND=<channel>,<bytes>` followed by the HTML payload.
-   - Closes connection via `AT+CIPCLOSE=<channel>` to release socket descriptor.
+**Core Logic / Pseudocode / Code Base:**
+- Server startup commands: `AT+CIPMUX=1` followed by `AT+CIPSERVER=1,80`.
+- When a client connects, the ESP8266 emits `+IPD,<link_id>,<len>:GET / HTTP/1.1`.
+- STM32 prepares the response payload:
+  ```html
+  HTTP/1.1 200 OK
+Content-Type: text/html
 
-## 📊 Verification & Results
-- Browser navigated to ESP8266 IP renders the status webpage successfully.
+
+  <h1>STM32 + ESP8266 IoT Web Server</h1><p>System Status: Active</p>
+  ```
+- Send data using `AT+CIPSEND=<link_id>,<length>` followed by payload, then close socket with `AT+CIPCLOSE=<link_id>`.
+
+**INFERENCE:**
+The STM32 and ESP8266 operated as a lightweight standalone web server. Typing the ESP8266 IP address in a computer browser rendered the status webpage correctly.
