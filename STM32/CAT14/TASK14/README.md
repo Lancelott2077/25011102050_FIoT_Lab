@@ -7,34 +7,38 @@
 **NAME OF EXP:** Sensor Interfacing (BME280) – MQTT – Node-RED Analytics
 
 **HARDWARE SETUP / PLATFORM:**
-- Microcontroller: STM32F401RE Nucleo-64
-- Sensor: Bosch BME280 (I2C1 on PB8/PB9)
-- Wi-Fi Modem: ESP8266 Wemos D1 Mini running MQTT client
-- MQTT Broker: Eclipse Mosquitto / Local Broker on Port 1883
-- Dashboard: Node-RED MQTT Subscriber Nodes
+- **Microcontroller:** STM32F401RE Nucleo-64 (84 MHz)
+- **Sensor:** Bosch BME280 (I2C1 on PB8 SCL, PB9 SDA)
+- **Wireless Modem:** ESP8266 Wemos D1 Mini running MQTT client firmware
+- **MQTT Broker:** Eclipse Mosquitto running on Port 1883
+- **Subscriber Dashboard:** Node-RED MQTT in-nodes connected to dashboard gauges
 
 **TASK NO:**
-1. Establish an MQTT connection from the embedded gateway to the MQTT broker.
-2. Sample calibrated temperature, humidity, and pressure from the BME280 sensor.
-3. Publish telemetry data under the topic `fiot/25011102050/bme280` and subscribe via Node-RED for real-time visualization.
+1. Configure an MQTT client connection from the embedded gateway to the Mosquitto broker.
+2. Acquire calibrated temperature, humidity, and pressure readings from the BME280 sensor.
+3. Publish telemetry payloads under topic `fiot/25011102050/bme280` and visualize data streams in Node-RED.
 
 **Circuit Diagram:**
 
 ![Circuit Diagram](circuit.png)
 
 **Core Logic / Pseudocode / Code Base:**
-- **MQTT Connection:** Client ID `STM32F4_Client_25011102050` connects to broker on port 1883 with keepalive of 60 seconds.
-- **Telemetry Assembly:**
+- **MQTT Protocol Integration:**
+  - Client ID: `STM32F4_25011102050`
+  - Broker Port: 1883, KeepAlive: 60 seconds
+  - Topic: `fiot/25011102050/bme280`
+- **Telemetry Payload Structure:**
   ```json
   {
-    "device": "25011102050_NUCLEO",
-    "temperature": 26.15,
-    "humidity": 59.30,
-    "pressure": 1011.85,
-    "timestamp": 84520
+    "device_id": "25011102050_NUCLEO_F401RE",
+    "temperature": 26.42,
+    "humidity": 58.15,
+    "pressure": 1012.30,
+    "uptime_ms": 128450
   }
   ```
-- **Pub/Sub Flow:** Dispatches MQTT `PUBLISH` packets. Node-RED subscribes to `fiot/25011102050/bme280` and routes data to dashboard gauges.
+- **Pub/Sub Advantages:**
+  Unlike HTTP polling, MQTT publish/subscribe provides asynchronous, low-overhead binary framing. Telemetry messages are published only upon state change or scheduled telemetry intervals, reducing Wi-Fi radio airtime and power consumption.
 
 **INFERENCE:**
-The publish/subscribe MQTT architecture provided lower network overhead and latency compared to HTTP polling. Environmental telemetry was broadcast to multiple dashboard subscribers simultaneously without packet loss.
+The MQTT publish/subscribe architecture demonstrated significantly lower network overhead and latency compared to HTTP. Environmental sensor data published by the STM32 was instantly received by Node-RED subscribers and displayed on real-time gauges.

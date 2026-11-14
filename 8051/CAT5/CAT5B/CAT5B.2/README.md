@@ -7,24 +7,25 @@
 **NAME OF EXP:** Hardware Timer and Interrupt-Based Timing - PWM DC Motor Speed Regulation
 
 **HARDWARE SETUP / PLATFORM:**
-- Microcontroller: AT89S52
-- Output Pin: Port 1 Pin 0 (P1.0)
-- Motor Driver: Transistor / L293D driver with flyback diode
-- Actuator: 5V DC Toy Motor
+- **Microcontroller:** AT89S52
+- **Output Pin:** Port 1 Pin 0 (`P1^0`) delivering PWM control signal
+- **Driver Interface:** Transistor driver / L293D dual H-bridge motor driver IC
+- **Actuator:** 5V Small DC Toy Motor with 1N4007 flyback diode connected across motor terminals
 
 **TASK NO:**
-1. Generate a variable-duty PWM signal using Timer0 interrupts.
-2. Interface the PWM output to a motor driver circuit.
-3. Verify speed variation across different duty cycle thresholds.
+1. Generate variable-duty PWM waveforms from the 8051 using Timer 0 interrupts.
+2. Interface the PWM output pin to an external motor driver circuit to protect MCU pins from motor current draw.
+3. Observe and measure rotational speed variation across stepped duty ratios (25%, 50%, 75%, 100%).
 
 **Circuit Diagram:**
 
 ![Circuit Diagram](circuit.png)
 
 **Core Logic / Pseudocode / Code Base:**
-- Timer0 ISR generates the base PWM timing intervals.
-- The average voltage delivered to the motor terminals is proportional to the duty cycle ratio ($	ext{V}_{	ext{avg}} = 	ext{V}_{	ext{supply}} 	imes 	ext{Duty}$).
-- Speed ramps smoothly by adjusting the duty ratio from 20% to 100% to prevent high starting current surges.
+- The average voltage applied to the motor is directly proportional to the duty cycle ratio:
+  $$V_{	ext{motor(avg)}} = V_{	ext{supply}} 	imes rac{T_{	ext{ON}}}{T_{	ext{ON}} + T_{	ext{OFF}}}$$
+- The driver circuit buffers the 8051 pin (which can sink/source only ~10–20 mA) and handles the motor's higher inductive running current (~150–250 mA).
+- A flyback diode placed antiparallel to the motor terminals clamps inductive back-EMF voltage spikes generated during PWM off-switching.
 
 **INFERENCE:**
-Timer0-generated PWM successfully varied the rotational speed of the DC motor. The driver circuit isolated motor inductive spikes from resetting the microcontroller.
+Regulating the average voltage delivered to the motor through variable-duty PWM provided smooth speed regulation without requiring analog voltage dividers. The inductive clamping diode and driver stage prevented electrical noise and back-EMF transients from resetting the microcontroller.

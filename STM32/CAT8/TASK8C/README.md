@@ -7,25 +7,45 @@
 **NAME OF EXP:** STM32 Temporal Button Press Classification (Short vs. Long Press)
 
 **HARDWARE SETUP / PLATFORM:**
-- Microcontroller: STM32F103C8T6 (Blue Pill)
-- Input: Normally-open tactile button with pull-up
-- Output: LED indicator on PC13
+- **Microcontroller:** STM32F103C8T6 (Blue Pill)
+- **Input:** Tactile pushbutton on GPIO input pin with pull-up resistor
+- **Output:** Status LED indicator on PC13
+- **Timer Mechanism:** 1 kHz ARM Cortex SysTick counter accessed via `HAL_GetTick()`
 
 **TASK NO:**
-1. Measure the duration of a button press using `HAL_GetTick()`.
-2. Classify the press as either a Short Press (< 1000 ms) or Long Press (≥ 1000 ms).
-3. Execute different LED actions depending on the classified press duration.
+1. Track the time of button press and button release using `HAL_GetTick()`.
+2. Compute the press duration $\Delta t = t_{	ext{release}} - t_{	ext{press}}$.
+3. Classify the duration into Short Press (< 1000 ms) or Long Press (≥ 1000 ms) and trigger distinct operational responses.
 
 **Circuit Diagram:**
 
 ![Circuit Diagram](circuit.png)
 
 **Core Logic / Pseudocode / Code Base:**
-- Detect falling edge when the button is pressed and record $t_{	ext{start}} = 	ext{HAL\_GetTick()}$.
-- Wait until button is released, then record $t_{	ext{stop}} = 	ext{HAL\_GetTick()}$.
-- Calculate duration $\Delta t = t_{	ext{stop}} - t_{	ext{start}}$:
-  - If $\Delta t < 1000 	ext{ ms}$: Short Press $\implies$ Toggle LED once.
-  - If $\Delta t \ge 1000 	ext{ ms}$: Long Press $\implies$ Trigger a 5-blink rapid burst.
+```c
+uint32_t press_start = 0;
+uint32_t press_duration = 0;
+
+if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN) == GPIO_PIN_RESET) {
+    HAL_Delay(20); // Debounce
+    if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN) == GPIO_PIN_RESET) {
+        press_start = HAL_GetTick();
+        while (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN) == GPIO_PIN_RESET); // Wait for release
+        press_duration = HAL_GetTick() - press_start;
+
+        if (press_duration < 1000) {
+            // Short press: Toggle LED once
+            HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+        } else {
+            // Long press: Execute rapid 5-blink alert burst
+            for (int i = 0; i < 5; i++) {
+                HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+                HAL_Delay(100);
+            }
+        }
+    }
+}
+```
 
 **INFERENCE:**
-Using SysTick timestamps allowed reliable differentiation between a momentary click and a sustained hold on a single button, doubling its functional utility.
+Time-domain classification using the millisecond SysTick counter allows a single mechanical input to serve multiple control roles. Short clicks and sustained long presses were cleanly distinguished, expanding user interface capability without adding extra physical buttons.

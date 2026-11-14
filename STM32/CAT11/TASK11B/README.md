@@ -7,26 +7,33 @@
 **NAME OF EXP:** Node-RED as HTTP Client of STM32/ESP8266 Server
 
 **HARDWARE SETUP / PLATFORM:**
-- Edge Node: STM32F103 + ESP8266 Web Server
-- Dashboard Host: PC running Node-RED runtime
+- **Embedded Node:** STM32F103 + ESP8266 HTTP Server (IP: `192.168.x.x`, Port 80)
+- **Analytics Host:** PC running Node-RED flow engine and Node-RED Dashboard UI
 
 **TASK NO:**
-1. Format sensor/status telemetry on the STM32 as a JSON string payload.
-2. Configure a Node-RED flow to poll the STM32 HTTP server periodically.
-3. Parse the received JSON and display live gauges and status cards on a web dashboard.
+1. Program the STM32 web server to serve telemetry formatted as a JSON string object.
+2. Build a Node-RED flow that polls the embedded server endpoint at a periodic interval.
+3. Parse the JSON response in Node-RED and plot live telemetry on digital dashboard gauges and trend charts.
 
 **Circuit Diagram:**
 
 ![Circuit Diagram](circuit.png)
 
 **Core Logic / Pseudocode / Code Base:**
-- STM32 responds to HTTP GET requests with JSON:
-  `{"status":"OK","uptime":245,"led":1}`
-- Node-RED Flow:
-  - **Inject Node:** Sends a trigger event every 2 seconds.
-  - **HTTP Request Node:** Issues `GET http://<ESP_IP>/api/data`.
-  - **JSON Node:** Parses the response string into a JavaScript object.
-  - **Dashboard Gauge / Text Nodes:** Binds object fields to visual widgets.
+- **JSON Telemetry Payload:**
+  ```json
+  {
+    "device_id": "STM32F103_25011102050",
+    "uptime_sec": 412,
+    "led_status": 1,
+    "system_state": "ACTIVE"
+  }
+  ```
+- **Node-RED Flow Architecture:**
+  - **Inject Node:** Recurring timer trigger configured for 2-second intervals.
+  - **HTTP Request Node:** Configured for method `GET` targeting `http://<ESP_IP>/status`.
+  - **JSON Parser Node:** Converts incoming string into JavaScript object properties (`msg.payload`).
+  - **UI Chart & Gauge Nodes:** Displays `msg.payload.uptime_sec` and `msg.payload.led_status` visually.
 
 **INFERENCE:**
-Integration between the embedded microcontroller server and an external Node-RED dashboard was verified over HTTP. Telemetry was retrieved and visualized in real time.
+RESTful HTTP polling between an IoT edge server and an external Node-RED dashboard was verified. Data acquired by the STM32 was successfully serialized into JSON and visualized on a web dashboard in real time.

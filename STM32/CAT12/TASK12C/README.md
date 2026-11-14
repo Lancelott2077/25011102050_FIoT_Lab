@@ -7,25 +7,25 @@
 **NAME OF EXP:** Short-Press and Long-Press Detection (NUCLEO-F401RE)
 
 **HARDWARE SETUP / PLATFORM:**
-- Board: NUCLEO-F401RE (Cortex-M4, 84 MHz)
-- Input: User Button B1 (PC13)
-- Indicator: Green LED LD2 (PA5)
+- **Board:** NUCLEO-F401RE (Cortex-M4, 84 MHz)
+- **Input:** Blue User Button B1 (PC13)
+- **Output:** Green User LED LD2 (PA5)
 
 **TASK NO:**
-1. Use the SysTick timer (`HAL_GetTick()`) to measure the exact duration of a button press on PC13.
-2. Classify the press into Short Press (< 1 second) or Long Press (≥ 1 second).
-3. Trigger a simple LED toggle on short press, and a rapid flashing alert pattern on long press.
+1. Use `HAL_GetTick()` to measure the exact millisecond duration of user button B1 presses.
+2. Classify the duration into Short Press (< 1000 ms) or Long Press (≥ 1000 ms).
+3. Execute a single state toggle on short press, and a rapid 10-blink alarm burst on long press.
 
 **Circuit Diagram:**
 
 ![Circuit Diagram](circuit.png)
 
 **Core Logic / Pseudocode / Code Base:**
-- On button press detected: record `t_start = HAL_GetTick()`.
-- Wait for button release: record `t_end = HAL_GetTick()`.
-- Duration `diff = t_end - t_start`:
-  - `diff < 1000`: Short Press $\implies$ Toggles LED LD2 once.
-  - `diff >= 1000`: Long Press $\implies$ Executes a rapid 10-blink alarm burst.
+- On falling edge (`PC13 == RESET`), record `t_start = HAL_GetTick()`.
+- Wait in a loop until button release (`PC13 == SET`), record `t_release = HAL_GetTick()`.
+- Calculate press duration: $\Delta t = t_{	ext{release}} - t_{	ext{start}}$.
+  - If $\Delta t < 1000 	ext{ ms}$: Short Press $\implies$ Invert LED LD2 once.
+  - If $\Delta t \ge 1000 	ext{ ms}$: Long Press $\implies$ Execute rapid 10-blink alarm pattern (50 ms ON / 50 ms OFF).
 
 **INFERENCE:**
-Accurate time-domain classification was achieved on a single user button. Short taps and sustained holds reliably triggered separate operational functions.
+Using SysTick timestamps for press duration classification successfully multiplexed the functionality of a single tactile button. Short taps and long holds triggered independent operational routines with high reliability.

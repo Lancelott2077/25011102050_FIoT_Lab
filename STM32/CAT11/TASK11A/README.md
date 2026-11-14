@@ -7,31 +7,38 @@
 **NAME OF EXP:** Configure ESP8266 TCP Server & Static HTTP Response
 
 **HARDWARE SETUP / PLATFORM:**
-- Host MCU: STM32F103C8T6
-- Wi-Fi Server: ESP8266 Wemos D1 Mini (Port 80)
-- Client: Web browser / HTTP client on the same local network
+- **Host MCU:** STM32F103C8T6
+- **Wi-Fi Gateway:** ESP8266 Wemos D1 Mini connected to local Wi-Fi network
+- **Network Protocol:** TCP/IP on Port 80 (HTTP)
+- **Client:** Web browser running on PC / smartphone on the same subnet
 
 **TASK NO:**
-1. Enable multi-connection socket multiplexing on ESP8266 (`AT+CIPMUX=1`).
-2. Start an internal TCP server listening on Port 80 (`AT+CIPSERVER=1,80`).
-3. Intercept incoming `GET /` requests and return an HTTP 200 OK HTML response page.
+1. Configure multi-connection socket multiplexing on the ESP8266 (`AT+CIPMUX=1`).
+2. Launch a TCP server listening on port 80 (`AT+CIPSERVER=1,80`).
+3. Parse incoming HTTP `GET /` requests and serve a static HTML response page with HTTP 200 OK headers.
 
 **Circuit Diagram:**
 
 ![Circuit Diagram](circuit.png)
 
 **Core Logic / Pseudocode / Code Base:**
-- Server startup commands: `AT+CIPMUX=1` followed by `AT+CIPSERVER=1,80`.
-- When a client connects, the ESP8266 emits `+IPD,<link_id>,<len>:GET / HTTP/1.1`.
-- STM32 prepares the response payload:
-  ```html
-  HTTP/1.1 200 OK
+- **Server Startup Sequence:**
+  `AT+CIPMUX=1` $ightarrow$ `AT+CIPSERVER=1,80`.
+- **Request Trapping:**
+  When a browser connects, the modem outputs: `+IPD,<channel_id>,<len>:GET / HTTP/1.1...`
+- **Response Transmission:**
+  1. Prepare response body:
+     ```html
+     HTTP/1.1 200 OK
 Content-Type: text/html
+Connection: close
 
 
-  <h1>STM32 + ESP8266 IoT Web Server</h1><p>System Status: Active</p>
-  ```
-- Send data using `AT+CIPSEND=<link_id>,<length>` followed by payload, then close socket with `AT+CIPCLOSE=<link_id>`.
+     <html><body><h1>STM32 + ESP8266 Embedded Server</h1><p>Node Status: OK</p></body></html>
+     ```
+  2. Issue `AT+CIPSEND=<channel_id>,<byte_count>`.
+  3. When the modem responds with `>`, send the HTML payload.
+  4. Terminate connection with `AT+CIPCLOSE=<channel_id>`.
 
 **INFERENCE:**
-The STM32 and ESP8266 operated as a lightweight standalone web server. Typing the ESP8266 IP address in a computer browser rendered the status webpage correctly.
+The combined STM32 and ESP8266 system functioned as an embedded HTTP web server. Client web browsers on the local network navigated to the ESP8266 IP address and rendered the served HTML status page.
